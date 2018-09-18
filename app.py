@@ -78,11 +78,14 @@ def users_post():
 
 @app.route("/users", methods=['GET'])
 def users_get():
+    
     team = request.args.get('team')
     user_team = {"users": []}
     for i in db.initial_db_state["users"]:
         if i["team"] == team:
             user_team["users"].append(i)
+    if len(user_team["users"]) == 0:
+        return create_response(db.initial_db_state)
     return create_response(user_team)
 
 @app.route("/users/<id>", methods=['PUT'])
@@ -134,7 +137,7 @@ def users_id_delete(id):
 def users_id_get(id):
     for i in db.initial_db_state["users"]:
         if i["id"] == int(id):
-            return create_response(i)
+            return create_response(db.getById("users", int(id)))
     return abort(404)
 
 @app.errorhandler(404)
