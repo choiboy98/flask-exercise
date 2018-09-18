@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from flask import Flask, jsonify, request, Response
+from flask import Flask, jsonify, request, Response, url_for, redirect
 import mockdb.mockdb_interface as db
 
 app = Flask(__name__)
@@ -51,7 +51,29 @@ def mirror(name):
     data = {"name": name}
     return create_response(data)
 
+@app.route("/users")
+def users():
+    team = request.args.get('team')
+    user_team = {}
+    for i in db.initial_db_state["users"]:
+        if i["team"] == team:
+            if user_team["users"] == None:
+                user_team["users"] = []
+                user_team["users"].append(i)
+            else:
+                user_team["users"].append(i)
+    return create_response(user_team)
 
+@app.route("/users/<id>")
+def users_id(id):
+    for i in db.initial_db_state["users"]:
+        if i["id"] == int(id):
+            return create_response(i)
+    return redirect('/404')
+
+@app.errorhandler(404)
+def id_not_found(e):
+    return "404 Error Message: Wrong id!"
 # TODO: Implement the rest of the API here!
 
 """
