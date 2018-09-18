@@ -54,14 +54,10 @@ def mirror(name):
 @app.route("/users")
 def users():
     team = request.args.get('team')
-    user_team = {}
+    user_team = {"users": []}
     for i in db.initial_db_state["users"]:
         if i["team"] == team:
-            if user_team["users"] == None:
-                user_team["users"] = []
-                user_team["users"].append(i)
-            else:
-                user_team["users"].append(i)
+            user_team["users"].append(i)
     return create_response(user_team)
 
 @app.route("/users/<id>")
