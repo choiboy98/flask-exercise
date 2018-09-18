@@ -123,6 +123,12 @@ def users_id_put(id):
     print(items)
     return create_response(items)
 
+@app.route("/users/<id>", methods=['DELETE'])
+def users_id_delete(id):
+    if db.getById("users", int(id)) == None:
+        abort(404)
+    db.deleteById("users", int(id))
+    return "successfully deleted id: " + id + "!"  
 
 @app.route("/users/<id>", methods=['GET'])
 def users_id_get(id):
