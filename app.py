@@ -51,8 +51,28 @@ def mirror(name):
     data = {"name": name}
     return create_response(data)
 
-@app.route("/users")
-def users():
+@app.route("/users", methods=['POST'])
+def users_post():
+    print(request.args)
+    
+    name = request.args['name']
+    age = request.args['age']
+    team = request.args['team']
+
+    if name == None or age == None or team == None:
+        abort(422)
+    new_user = {
+        "id": "",
+        "name": name,
+        "age": age,
+        "team": team
+    }
+
+    new_user = db.create("users", new_user)
+    return create_response(new_user, status = 201)
+
+@app.route("/users", methods=['GET'])
+def users_get():
     team = request.args.get('team')
     user_team = {"users": []}
     for i in db.initial_db_state["users"]:
@@ -65,11 +85,15 @@ def users_id(id):
     for i in db.initial_db_state["users"]:
         if i["id"] == int(id):
             return create_response(i)
-    return redirect('/404')
+    return abort(404)
 
 @app.errorhandler(404)
 def id_not_found(e):
     return "404 Error Message: Wrong id!"
+
+@app.errorhandler(422)
+def id_not_found(e):
+    return "422 Error Message: You did not provide the correct parameters! Please provide name, age, and team!"
 # TODO: Implement the rest of the API here!
 
 """
