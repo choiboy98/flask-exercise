@@ -41,21 +41,32 @@ def test_get_user_id(client):
     assert res_user["name"] == "Aria"
     assert res_user["age"] == 19
 
+
 def test_add_users(client):
-    res = client.post("/users", query_string=dict({'name' : 'Daniel', 'team': 'Hack4Impact', 'age': 20}), content_type='application/json')
+    res = client.post(
+        "/users",
+        query_string=dict({"name": "Daniel", "team": "Hack4Impact", "age": 20}),
+        content_type="application/json",
+    )
     print(res)
     assert res.status_code == 201
 
     res_user = res.json["result"]
     assert res_user["name"] == "Daniel"
 
+
 def test_put_users(client):
-    res = client.put("/users/1", query_string=dict({'name': 'Daniel'}), content_type='application/json')
+    res = client.put(
+        "/users/1",
+        query_string=dict({"name": "Daniel"}),
+        content_type="application/json",
+    )
     assert res.status_code == 200
 
     res_user = res.json["result"]
     assert res_user["name"] == "Daniel"
 
+
 def test_delete_users(client):
-    res = client.delete("/users/1", content_type='application/json')
+    res = client.delete("/users/1", content_type="application/json")
     print(res)

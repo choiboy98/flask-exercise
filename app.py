@@ -51,35 +51,32 @@ def mirror(name):
     data = {"name": name}
     return create_response(data)
 
-@app.route("/users", methods=['POST'])
+
+@app.route("/users", methods=["POST"])
 def users_post():
     print(request.args)
-    name = ''
+    name = ""
     age = 0
-    team = ''
+    team = ""
 
     try:
-        name = request.args['name']
-        age = request.args['age']
-        team = request.args['team']
+        name = request.args["name"]
+        age = request.args["age"]
+        team = request.args["team"]
 
     except:
         abort(422)
 
-    new_user = {
-        "id": "",
-        "name": name,
-        "age": age,
-        "team": team
-    }
+    new_user = {"id": "", "name": name, "age": age, "team": team}
 
     new_user = db.create("users", new_user)
-    return create_response(new_user, status = 201)
+    return create_response(new_user, status=201)
 
-@app.route("/users", methods=['GET'])
+
+@app.route("/users", methods=["GET"])
 def users_get():
-    
-    team = request.args.get('team')
+
+    team = request.args.get("team")
     user_team = {"users": []}
     for i in db.initial_db_state["users"]:
         if i["team"] == team:
@@ -88,65 +85,68 @@ def users_get():
         return create_response(db.initial_db_state)
     return create_response(user_team)
 
-@app.route("/users/<id>", methods=['PUT'])
+
+@app.route("/users/<id>", methods=["PUT"])
 def users_id_put(id):
     if db.getById("users", int(id)) == None:
         abort(404)
-    name = ''
+    name = ""
     age = -1
-    team = ''
+    team = ""
 
     try:
-        name = request.args['name']
+        name = request.args["name"]
     except:
         pass
 
     try:
-        age = request.args['age']
+        age = request.args["age"]
     except:
         pass
     try:
-        team = request.args['team']
+        team = request.args["team"]
     except:
         pass
-    
-    items = {
-        "name": name,
-        "age": age,
-        "team": team
-    }
-    if name == '':
+
+    items = {"name": name, "age": age, "team": team}
+    if name == "":
         items.pop("name", None)
     if age == -1:
         items.pop("age", None)
-    if team == '':
+    if team == "":
         items.pop("team", None)
 
     items = db.updateById("users", int(id), items)
     print(items)
     return create_response(items)
 
-@app.route("/users/<id>", methods=['DELETE'])
+
+@app.route("/users/<id>", methods=["DELETE"])
 def users_id_delete(id):
     if db.getById("users", int(id)) == None:
         abort(404)
     db.deleteById("users", int(id))
-    return "successfully deleted id: " + id + "!"  
+    return "successfully deleted id: " + id + "!"
 
-@app.route("/users/<id>", methods=['GET'])
+
+@app.route("/users/<id>", methods=["GET"])
 def users_id_get(id):
     for i in db.initial_db_state["users"]:
         if i["id"] == int(id):
             return create_response(db.getById("users", int(id)))
     return abort(404)
 
+
 @app.errorhandler(404)
 def id_not_found(e):
     return "404 Error Message: Wrong id!"
 
+
 @app.errorhandler(422)
 def id_not_found(e):
     return "422 Error Message: You did not provide the correct parameters! Please provide name, age, and team!"
+
+
 # TODO: Implement the rest of the API here!
 
 """
