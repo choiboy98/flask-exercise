@@ -1,6 +1,6 @@
 from typing import Tuple
 
-from flask import Flask, jsonify, request, Response, url_for, redirect
+from flask import Flask, jsonify, request, Response, url_for, redirect, abort
 import mockdb.mockdb_interface as db
 
 app = Flask(__name__)
@@ -54,13 +54,18 @@ def mirror(name):
 @app.route("/users", methods=['POST'])
 def users_post():
     print(request.args)
-    
-    name = request.args['name']
-    age = request.args['age']
-    team = request.args['team']
+    name = ''
+    age = 0
+    team = ''
 
-    if name == None or age == None or team == None:
+    try:
+        name = request.args['name']
+        age = request.args['age']
+        team = request.args['team']
+
+    except:
         abort(422)
+
     new_user = {
         "id": "",
         "name": name,
@@ -80,8 +85,47 @@ def users_get():
             user_team["users"].append(i)
     return create_response(user_team)
 
-@app.route("/users/<id>")
-def users_id(id):
+@app.route("/users/<id>", methods=['PUT'])
+def users_id_put(id):
+    if db.getById("users", int(id)) == None:
+        abort(404)
+    name = ''
+    age = -1
+    team = ''
+
+    try:
+        name = request.args['name']
+    except:
+        pass
+
+    try:
+        age = request.args['age']
+    except:
+        pass
+    try:
+        team = request.args['team']
+    except:
+        pass
+    
+    items = {
+        "name": name,
+        "age": age,
+        "team": team
+    }
+    if name == '':
+        items.pop("name", None)
+    if age == -1:
+        items.pop("age", None)
+    if team == '':
+        items.pop("team", None)
+
+    items = db.updateById("users", int(id), items)
+    print(items)
+    return create_response(items)
+
+
+@app.route("/users/<id>", methods=['GET'])
+def users_id_get(id):
     for i in db.initial_db_state["users"]:
         if i["id"] == int(id):
             return create_response(i)
